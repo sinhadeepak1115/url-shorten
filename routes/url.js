@@ -5,6 +5,22 @@ const { nanoid } = require("nanoid");
 
 // Route to create a short URL
 router.post("/shorten", async (req, res) => {
-  const { originalUrl, expiresAt } = req.body;
-  const shortUrl = nanoid(6);
+  const { longUrl } = req.body;
+  const urlCode = nanoid(6);
+  const shortUrl = `http://localhost:3000/${urlCode}`;
+
+  try {
+    let url = new Url({
+      urlCode,
+      longUrl,
+      shortUrl,
+    });
+    await url.save();
+    res.json(shortUrl);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Server error");
+  }
 });
+
+module.exports = router;
