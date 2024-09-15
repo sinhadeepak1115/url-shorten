@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Url = require("../model/url");
-const { nanoid } = require("nanoid");
+import Url from "../model/url.js";
+import { nanoid } from "nanoid";
 
-// Route to create a short URL
+// Post router create a short URL
 router.post("/shorten", async (req, res) => {
   const { longUrl } = req.body;
   const urlCode = nanoid(6);
@@ -23,4 +23,17 @@ router.post("/shorten", async (req, res) => {
   }
 });
 
-module.exports = router;
+router.get("/:urlCode", async (req, res) => {
+  try {
+    const url = await Url.findOne({ urlCode: req.params.urlCode });
+    if (url) {
+      return res.redirect(url.longUrl);
+    } else {
+      return res.status(404).json("No URL Found");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Server error");
+  }
+});
+export default router;
